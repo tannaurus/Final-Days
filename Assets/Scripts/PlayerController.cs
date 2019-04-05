@@ -4,24 +4,27 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    // State
     public float movementSpeed = 2f;
-    private Rigidbody player;
 
+    // Inputs
     private Vector3 moveInput;
     private Vector3 moveVelocity;
 
+    // Components
     private Camera mainCamera;
+    private Rigidbody player;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         // Grab the Rigidbody and set it as the "player"
         player = GetComponent<Rigidbody>();
         // Locate the camera object
         mainCamera = FindObjectOfType<Camera>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+    
+    // Update is called once per frame
+    void Update () {
         UpdatePlayerDirectionalMovement();
         UpdatePlayerRotation();
     }
@@ -62,4 +65,5 @@ public class PlayerController : MonoBehaviour {
             transform.LookAt(pointToLook);
         }
     }
+
 }
