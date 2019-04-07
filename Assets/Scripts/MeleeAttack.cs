@@ -16,6 +16,8 @@ public class MeleeAttack : MonoBehaviour {
         }
     }
 
+    private float attackCooldown;
+
     // Use this for initialization
     void Start () {
         FindActiveWeapon();
@@ -66,6 +68,8 @@ public class MeleeAttack : MonoBehaviour {
                 // Give both of those values to the "GetThrown" in order to throw the enemy backware
                 col.SendMessage("GetThrown", attackThrow);
             }
+            // Create a buffer between attacks
+            attackCooldown = Time.time + weapon.speed;
             // Make sure we don't get stuck in a loop
             i++;
         }
@@ -73,6 +77,10 @@ public class MeleeAttack : MonoBehaviour {
 
     void Attack()
     {
-        LocateEnemyInWeaponRange();
+        // Only attack after the cooldown buffer time window has passed.
+        if (Time.time > attackCooldown)
+        {
+            LocateEnemyInWeaponRange();
+        }
     }
 }

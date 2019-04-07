@@ -254,6 +254,7 @@ MonoBehaviour:
   damage: 10
   range: 100
   attackAngle: 45
+  speed: 2
 --- !u!136 &136994385176035714
 CapsuleCollider:
   m_ObjectHideFlags: 1
