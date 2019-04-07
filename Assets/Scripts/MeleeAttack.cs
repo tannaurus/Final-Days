@@ -41,15 +41,21 @@ public class MeleeAttack : MonoBehaviour {
 
     void LocateEnemyInWeaponRange()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z), weapon.range);
+        // Grab height of the game object. This will help us scan for objects "in front of us"
+        float objectHeight = transform.lossyScale.y;
+        // Find any colliders within the weapon's range. Not that, for the starting position, we're starting from the height's middle point.  
+        Collider[] hitColliders = Physics.OverlapSphere(new Vector3(transform.position.x, transform.position.y + (objectHeight / 2), transform.position.z), weapon.range);
         int i = 0;
         while (i < hitColliders.Length)
         {
             Collider col = hitColliders[i];
+            // Check to ensure we're interacting with only the tags we want to interact with.
             if (col.tag == "Infected")
             {
+                // Give the Infected weapon damage.
                 col.SendMessage("TakeDamage", weapon.damage);
                 // Create a value that will act as the force given to the enemy being thrown in the direction of the attack.
+                // The value that "damage" is multiplied is arbitrary to achieve the desired effect. 
                 float throwForce = weapon.damage * 150;
                 // Do the math to calculate the angle in which the target is from the enemy.
                 Vector3 directionToTarget = col.transform.position - transform.position;
@@ -60,6 +66,7 @@ public class MeleeAttack : MonoBehaviour {
                 // Give both of those values to the "GetThrown" in order to throw the enemy backware
                 col.SendMessage("GetThrown", attackThrow);
             }
+            // Make sure we don't get stuck in a loop
             i++;
         }
     }
