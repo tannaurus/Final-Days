@@ -181,4 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8836811e5dc1b4b908f66dbd4a4fb89f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultSkin: {fileID: 2100000, guid: 0efba92b732bd4ced99d23cd6f4a298b, type: 2}
+  damagedSkin: {fileID: 2100000, guid: 1d99235f9ab38468aafbd8d1365db4bb, type: 2}
+  damageTime: 0.5
   health: 100

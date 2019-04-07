@@ -194,6 +194,21 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 114893192909982872, guid: 5ab69c57c3833408492158a0c5daa686,
+        type: 2}
+      propertyPath: defaultSkin
+      value: 
+      objectReference: {fileID: 2100000, guid: 0efba92b732bd4ced99d23cd6f4a298b, type: 2}
+    - target: {fileID: 114893192909982872, guid: 5ab69c57c3833408492158a0c5daa686,
+        type: 2}
+      propertyPath: damagedSkin
+      value: 
+      objectReference: {fileID: 2100000, guid: 1d99235f9ab38468aafbd8d1365db4bb, type: 2}
+    - target: {fileID: 114893192909982872, guid: 5ab69c57c3833408492158a0c5daa686,
+        type: 2}
+      propertyPath: damageTime
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5ab69c57c3833408492158a0c5daa686, type: 2}
   m_IsPrefabParent: 0
