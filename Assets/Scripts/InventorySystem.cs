@@ -4,32 +4,26 @@ using UnityEngine;
 
 public class InventorySystem : MonoBehaviour
 {
+    // Config
+    public int backpackSize = 10;
+    public int pickUpRange = 3;
 
-    public Weapon activeWeapon;
-    public Collider defaultWeapon;
-    public float pickUpRange = 3f;
+    public Item rightHand;
+    public List<Item> backpack = new List<Item>();
+    // An object on the player to hold all of the player's items
+    public GameObject inventoryObject;
 
-    private float cooldown;
-    private bool handsFull = false;
 
-    void Start()
+    void Update()
     {
-        EquipDefaultWeapon();
+        PlayerInputListener();
     }
 
-    // Update is called once per frame
-    void Update()
+    void PlayerInputListener()
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
-            if (!handsFull)
-            {
-                PickUpItem();
-            }
-            else
-            {
-                DropItem();
-            }
+            PickUpItem();
         }
     }
 
@@ -37,45 +31,125 @@ public class InventorySystem : MonoBehaviour
     {
         // Grab height of the game object. This will help us scan for objects "in front of us"
         float objectHeight = transform.lossyScale.y;
-        // Find any colliders within the weapon's range. Not that, for the starting position, we're starting from the height's middle point.  
+        // Find any colliders within the weapon's range. Note: for the starting position, we're starting from the height's middle point.  
         Collider[] hitColliders = Physics.OverlapSphere(new Vector3(transform.position.x, transform.position.y + (objectHeight / 2), transform.position.z), pickUpRange);
         int i = 0;
         while (i < hitColliders.Length)
         {
             Collider col = hitColliders[i];
-            // Check to ensure we're interacting with only the tags we want to interact with.
-            if (col.tag == "Melee")
+            if (col.tag == "Item")
             {
                 // Grab the weapon script on our found melee weapon
-                Weapon foundWeapon = col.gameObject.GetComponent<Weapon>();
-                Equip(foundWeapon);
+                Item foundItem = col.gameObject.GetComponent<Item>();
+                Equip(foundItem);
             }
-            // Make sure we don't get stuck in a loop
             i++;
         }
     }
 
-    void Equip(Weapon weapon)
+    void Equip(Item item)
     {
-        // Tell the weapon collider to set this gameObject to be its parent
-        weapon.SendMessage("Equip", gameObject);
-        activeWeapon = weapon;
-        handsFull = true;
+        if (CanEquip())
+        {
+            backpack.Add(item);
+            // Give the item the inventory game object to set its parent to
+            item.Equip(gameObject);
+        }
     }
 
-    void DropItem()
+    // This won't work right now, going to refactor later.
+    void DropItem(int backpackPosition)
     {
-        // Change the weapon to its dropped state
-        activeWeapon.SendMessage("Drop");
-        EquipDefaultWeapon();
-        handsFull = false;
+        if (rightHand != null) {
+            rightHand.transform.parent = null;
+            backpack[backpackPosition] = null;
+        }
     }
 
-    void EquipDefaultWeapon()
+    bool CanEquip() {
+        return backpack.Count < backpackSize;
+    }
+
+    bool hasActiveWeapon()
     {
-        Debug.Log("WEAPON");
-        Debug.Log(defaultWeapon.gameObject.GetComponent<Weapon>().damage);
-        //Equip(newWeapon);
+        return rightHand.type == Item.ItemTypes.Weapon;
     }
 
 }
+//public class InventorySystem : MonoBehaviour
+//{
+
+//    public Weapon activeWeapon;
+
+//    [SerializeField]
+//    private float pickUpRange = 3f;
+//    private Collider defaultWeapon;
+
+//    private float cooldown;
+//    private bool handsFull = false;
+
+//    void Start()
+//    {
+//        EquipDefaultWeapon();
+//    }
+
+//    // Update is called once per frame
+//    void Update()
+//    {
+//        if (Input.GetKeyDown(KeyCode.X))
+//        {
+//            if (!handsFull)
+//            {
+//                PickUpItem();
+//            }
+//            else
+//            {
+//                DropItem();
+//            }
+//        }
+//    }
+
+//    void PickUpItem()
+//    {
+//        // Grab height of the game object. This will help us scan for objects "in front of us"
+//        float objectHeight = transform.lossyScale.y;
+//        // Find any colliders within the weapon's range. Not that, for the starting position, we're starting from the height's middle point.  
+//        Collider[] hitColliders = Physics.OverlapSphere(new Vector3(transform.position.x, transform.position.y + (objectHeight / 2), transform.position.z), pickUpRange);
+//        int i = 0;
+//        while (i < hitColliders.Length)
+//        {
+//            Collider col = hitColliders[i];
+//            // Check to ensure we're interacting with only the tags we want to interact with.
+//            if (col.tag == "Melee")
+//            {
+//                // Grab the weapon script on our found melee weapon
+//                Weapon foundWeapon = col.gameObject.GetComponent<Weapon>();
+//                Equip(foundWeapon);
+//            }
+//            // Make sure we don't get stuck in a loop
+//            i++;
+//        }
+//    }
+
+//    void Equip(Weapon weapon)
+//    {
+//        activeWeapon = weapon;
+//        handsFull = true;
+//    }
+
+//    void DropItem()
+//    {
+//        // Change the weapon to its dropped state
+//        activeWeapon.SendMessage("Drop");
+//        EquipDefaultWeapon();
+//        handsFull = false;
+//    }
+
+//    void EquipDefaultWeapon()
+//    {
+//        Debug.Log("WEAPON");
+//        Debug.Log(defaultWeapon.gameObject.GetComponent<Weapon>().damage);
+//        //Equip(newWeapon);
+//    }
+
+//}

@@ -5,6 +5,7 @@ using UnityEngine;
 public class InfectedAI : MonoBehaviour {
 
     private Transform player;
+    public bool awake = true;
     public float movementSpeed = 10f;
     public float viewDistance = 10f;
     public float minDistance = 1f;
@@ -18,7 +19,10 @@ public class InfectedAI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        monitorPlayer();
+        if (awake)
+        {
+            monitorPlayer();
+        }
 	}
 
     void OnCollisionEnter(Collision collision)

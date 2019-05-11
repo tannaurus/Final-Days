@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class MeleeAttack : MonoBehaviour {
 
-    public Weapon weapon; 
     public class Throw
     {
         public Vector3 dir;
@@ -16,21 +15,25 @@ public class MeleeAttack : MonoBehaviour {
         }
     }
 
+    private InventoryController inventorySystem;
+    public Weapon weapon;
     private float attackCooldown;
 
-    // Use this for initialization
-    void Start () {
-        FindActiveWeapon();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    void Start()
+    {
+        inventorySystem = GetComponent<InventoryController>();
+        weapon = inventorySystem.activeWeapon;
+    }
+
+    // Update is called once per frame
+    void Update () {
 		if (Input.GetKeyDown(KeyCode.Z)) {
-            if (!weapon)
-            {
-                FindActiveWeapon();
-            }
             Attack();
+        }
+
+        if (inventorySystem.activeWeapon != weapon)
+        {
+            weapon = inventorySystem.activeWeapon;
         }
     }
 

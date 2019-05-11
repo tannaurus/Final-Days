@@ -28,7 +28,7 @@ GameObject:
   - component: {fileID: 54492581181164370}
   m_Layer: 0
   m_Name: Bat
-  m_TagString: Melee
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 41
@@ -60,7 +60,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 47ecc8089f7ed4614b290cb33d82e6b9, type: 2}
+  - {fileID: 2100000, guid: 55296d1b6ee54e14e8eb4648d4b448ee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5171,7 +5171,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17a4ab275b092470baa2ed93495244d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Bat
+  backpackSize: 10
+  pickUpRange: 3
+  rightHand: {fileID: 0}
+  backpack: []
   damage: 20
   range: 3
   attackAngle: 45

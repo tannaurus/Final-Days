@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-    // State
+    // Config
     public float movementSpeed = 2f;
 
     // Inputs
@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour {
     
     // Update is called once per frame
     void Update () {
-        UpdatePlayerDirectionalMovement();
+        UpdatePlayerMovement();
         UpdatePlayerRotation();
     }
 
@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour {
         player.velocity = moveVelocity;
     }
 
-    void UpdatePlayerDirectionalMovement()
+    void UpdatePlayerMovement()
     {
         // ** -- MOVEMENT -- **
         // Grab the input of the player, leaving the Y value as 0f

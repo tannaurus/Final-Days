@@ -4,13 +4,21 @@ using UnityEngine;
 
 public class InventoryController : MonoBehaviour {
 
-    public Collider hand;
+    public Weapon activeWeapon;
+    public Collider defaultWeapon;
     public float pickUpRange = 3f;
+
     private float cooldown;
     private bool handsFull = false;
-	
-	// Update is called once per frame
-	void Update () {
+
+    void Start()
+    {
+        EquipDefaultWeapon();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
         if (Input.GetKeyDown(KeyCode.X))
         {
             if (!handsFull)
@@ -37,20 +45,36 @@ public class InventoryController : MonoBehaviour {
             // Check to ensure we're interacting with only the tags we want to interact with.
             if (col.tag == "Melee")
             {
-                // Give the Infected weapon damage.
-                col.SendMessage("Equip", gameObject);
-                hand = col;
-                handsFull = true;
+                // Grab the weapon script on our found melee weapon
+                Weapon foundWeapon = col.gameObject.GetComponent<Weapon>();
+                Equip(foundWeapon);
             }
             // Make sure we don't get stuck in a loop
             i++;
         }
     }
 
+    void Equip(Weapon weapon)
+    {
+        // Tell the weapon collider to set this gameObject to be its parent
+        weapon.SendMessage("Equip", gameObject);
+        activeWeapon = weapon;
+        handsFull = true;
+    }
+
     void DropItem()
     {
-        hand.SendMessage("Drop");
+        // Change the weapon to its dropped state
+        activeWeapon.SendMessage("Drop");
+        EquipDefaultWeapon();
         handsFull = false;
+    }
+
+    void EquipDefaultWeapon()
+    {
+        Debug.Log("WEAPON");
+        Debug.Log(defaultWeapon.gameObject.GetComponent<Weapon>().damage);
+        //Equip(newWeapon);
     }
 
 }
