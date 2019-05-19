@@ -8,11 +8,10 @@ public class InventorySystem : MonoBehaviour
     public int backpackSize = 10;
     public int pickUpRange = 3;
 
-    public Item rightHand;
-    public List<Item> backpack = new List<Item>();
+    public Types.Hand rightHand;
+    public List<Types.Hand> backpack = new List<Types.Hand>();
     // An object on the player to hold all of the player's items
     public GameObject inventoryObject;
-
 
     void Update()
     {
@@ -24,6 +23,10 @@ public class InventorySystem : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.X))
         {
             PickUpItem();
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            DropItem();
         }
     }
 
@@ -40,39 +43,34 @@ public class InventorySystem : MonoBehaviour
             if (col.tag == "Item")
             {
                 // Grab the weapon script on our found melee weapon
-                Item foundItem = col.gameObject.GetComponent<Item>();
+                Types.Hand foundItem = new Types.Hand(col.gameObject);
+                Debug.Log(foundItem);
                 Equip(foundItem);
             }
             i++;
         }
     }
 
-    void Equip(Item item)
+    void Equip(Types.Hand hand)
     {
         if (CanEquip())
         {
-            backpack.Add(item);
+            backpack.Add(hand);
             // Give the item the inventory game object to set its parent to
-            item.Equip(gameObject);
+            hand.item.Equip(gameObject);
+            rightHand = hand;
         }
     }
 
-    // This won't work right now, going to refactor later.
-    void DropItem(int backpackPosition)
+    void DropItem()
     {
         if (rightHand != null) {
-            rightHand.transform.parent = null;
-            backpack[backpackPosition] = null;
+            rightHand.item.Drop();
         }
     }
 
     bool CanEquip() {
         return backpack.Count < backpackSize;
-    }
-
-    bool hasActiveWeapon()
-    {
-        return rightHand.type == Item.ItemTypes.Weapon;
     }
 
 }

@@ -5,14 +5,11 @@ using UnityEngine;
 
 public class Item : MonoBehaviour {
 
-    // Constants
-    public enum ItemTypes { Weapon };
-
     // Config
     public int id;
     public Image icon;
     public string name = "Item";
-    public ItemTypes type;
+    public Types.Items type;
     public Vector3 inHandPosition;
     public Vector3 inHandRotation;
 
@@ -56,7 +53,7 @@ public class Item : MonoBehaviour {
         isEquiped = true;
     }
 
-    void Drop()
+    public void Drop()
     {
         // Clear the player's parent
         gameObject.transform.parent = null;

@@ -5171,13 +5171,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17a4ab275b092470baa2ed93495244d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backpackSize: 10
-  pickUpRange: 3
-  rightHand: {fileID: 0}
-  backpack: []
+  id: 0
+  icon: {fileID: 0}
+  name: Bat
+  type: 0
+  inHandPosition: {x: 0.4748459, y: -0.1259999, z: -0.04598522}
+  inHandRotation: {x: 69.311, y: 9.717, z: 0}
   damage: 20
   range: 3
   attackAngle: 45
   speed: 2
-  inHandPosition: {x: 0.4748459, y: -0.1259999, z: -0.04598522}
-  inHandRotation: {x: 69.311, y: 9.717, z: 0}
+  force: 2

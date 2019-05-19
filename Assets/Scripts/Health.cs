@@ -20,15 +20,14 @@ public class Health : MonoBehaviour {
     }
 
     // Throw the rb in the specifed direction.
-    // This is typically invoked via the weapon script.
-    void GetThrown(MeleeAttack.Throw attackThrow)
+    public void GetThrown(Types.Throw attackThrow)
     {  
         rb.AddForce(attackThrow.dir * attackThrow.force);
     }
 
     // Remove the specified "damage" from "health", flash the materials, and destroy the gameObject if it is out of health.
     // This is typically invoked via the weapon script.
-    void TakeDamage(float damage)
+    public void TakeDamage(float damage)
     {
         health -= damage;
         StartCoroutine(FlashMaterial());
