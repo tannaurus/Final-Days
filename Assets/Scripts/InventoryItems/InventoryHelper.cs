@@ -7,20 +7,20 @@ public static class InventoryHelper
 
     public static Types.Hand GetActiveHand(InventorySystem inventory)
     {
-        return inventory.rightHand;
+        return inventory.backpack[0];
     }
 
     public static Types.Items GetActiveItemType(InventorySystem inventory)
     {
-        return inventory.rightHand.item.type;
+        return GetActiveItem(inventory).type;
     }
 
     public static Item GetActiveItem(InventorySystem inventory) {
-        Types.Hand hand = inventory.rightHand;
-        if (hand.item)
+        Types.Hand hand = GetActiveHand(inventory);
+        if (hand == null)
         {
-            return hand.item;
+            return null;
         }
-        return null;
+        return hand.item;
     }
 }

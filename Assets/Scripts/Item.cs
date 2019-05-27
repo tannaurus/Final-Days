@@ -55,6 +55,7 @@ public class Item : MonoBehaviour {
 
     public void Drop()
     {
+        Debug.Log("DROP");
         // Clear the player's parent
         gameObject.transform.parent = null;
         // Re-enable gravity
