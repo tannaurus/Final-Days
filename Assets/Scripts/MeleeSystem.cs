@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MeleeSystem : Weapon {
 
-    private float attackCooldown = 1f;
+    private float attackCooldown = 0.1f;
     // This is handed to the InventoryHelper class so it must be public.
     public InventorySystem playerInventory;
 

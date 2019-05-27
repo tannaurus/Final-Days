@@ -6,10 +6,12 @@ public class PlayerController : MonoBehaviour {
 
     // Config
     public float movementSpeed = 2f;
+    public float lookSpeed = 2f;
 
     // Inputs
     private Vector3 moveInput;
     private Vector3 moveVelocity;
+    private Vector3 movement;
 
     // Components
     private Camera mainCamera;
@@ -25,7 +27,6 @@ public class PlayerController : MonoBehaviour {
     
     // Update is called once per frame
     void Update () {
-        UpdatePlayerMovement();
         UpdatePlayerRotation();
     }
 
@@ -33,15 +34,22 @@ public class PlayerController : MonoBehaviour {
     {
         // Update the player's movement
         player.velocity = moveVelocity;
+        UpdatePlayerMovement();
     }
 
     void UpdatePlayerMovement()
     {
-        // ** -- MOVEMENT -- **
+        // ** -- MOVEMENT -- **        
         // Grab the input of the player, leaving the Y value as 0f
-        moveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
-        // Multiply that value by our speed
-        moveVelocity = moveInput * movementSpeed;
+        movement.Set(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
+        // Normalize that captured movement, calculating speed and time.
+        movement = movement.normalized * movementSpeed * Time.deltaTime;
+
+        player.MovePosition(transform.position + (transform.forward * movement.z) + (transform.right * movement.x));
+
+        //moveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
+        //// Multiply that value by our speed
+        //moveVelocity = moveInput * movementSpeed;
     }
 
     void UpdatePlayerRotation()
@@ -60,9 +68,14 @@ public class PlayerController : MonoBehaviour {
             Vector3 pointToLook = cameraRay.GetPoint(rayLength);
             Debug.DrawLine(cameraRay.origin, pointToLook, Color.blue);
             // Fix the player's y position so they don't rotate down/up
-            pointToLook.y = transform.position.y;
             // Set the player's transform to look at the intersect
-            transform.LookAt(pointToLook);
+            // transform.LookAt(pointToLook);
+            Vector3 direction = pointToLook - transform.position;
+            Quaternion toRotation = Quaternion.FromToRotation(transform.forward, direction);
+            Quaternion calculatedRotation = Quaternion.Lerp(transform.rotation, toRotation, lookSpeed * Time.time);
+            calculatedRotation.x = 0;
+            calculatedRotation.z = 0;
+            transform.rotation = calculatedRotation;
         }
     }
 
