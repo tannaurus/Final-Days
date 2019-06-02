@@ -22,7 +22,7 @@ public class Item : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
     }
 
-    void LateUpdate()
+    void Update()
     {
         // If the item is equiped regularly update it's position to be next to the player 
         if (isEquiped)
