@@ -5,14 +5,18 @@ using UnityEngine.AI;
 
 public class BeingBehavior : MonoBehaviour
 {
+    public bool awake = true;
+    public float viewDistance = 100f;
+    public float viewAngle = 60f;
+    public float suspiciousness = 0.5f;
+
     private Transform player;
     private Vector3 lastKnowPlayerPos;
     private NavMeshAgent agent;
     private BeingHead brain;
-    public bool awake = true;
-    public float viewDistance = 100f;
-    public float viewAngle = 60f;
-
+    private float suspicion = 0f;
+    private float prevSuspicion = 0f;
+    
     // Use this for initialization
     void Start()
     {
@@ -20,17 +24,47 @@ public class BeingBehavior : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         brain = GetComponentInChildren<BeingHead>();
         lastKnowPlayerPos = transform.position;
+        InvokeRepeating("ManageSuspicion", 0f, 1f);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (awake & CanSeePlayer())
+        ManageBehaviorTowardsPlayer();
+    }
+
+    void ManageSuspicion()
+    {
+        if (CanSeePlayer())
         {
-            RotateBody();
-            brain.OnSite();
+            lastKnowPlayerPos = player.position;
+            prevSuspicion = suspicion;
+            suspicion += suspiciousness;
+        } else if (suspicion > 0f)
+        {
+            suspicion -= suspiciousness;
         }
-        UpdateMovement();
+    }
+
+    void ManageBehaviorTowardsPlayer()
+    {
+        Debug.Log(suspicion);
+        if (CanSeePlayer())
+        {
+            if (suspicion > 3f)
+            {
+                brain.OnSite();
+            }
+            if (suspicion > 5f)
+            {
+                RotateBody();
+                MoveTowardsPlayer();
+            }
+        }
+        else
+        {
+            MoveTowardsLastKnownPlayerPos();
+        }
     }
 
     bool CanSeePlayer()
@@ -38,11 +72,9 @@ public class BeingBehavior : MonoBehaviour
         float distanceFromPlayer = Vector3.Distance(transform.position, player.position);
         Vector3 playerDirection = player.position - transform.position;
         float angleOfView = Vector3.Angle(playerDirection, transform.forward);
-        if (distanceFromPlayer <= viewDistance & angleOfView <= viewAngle & brain.HasEyesOnPlayer()) {
-            lastKnowPlayerPos = player.position;
+        if (distanceFromPlayer <= viewDistance & angleOfView <= viewAngle & brain.PlayerInLineOfSight()) {
             return true;
         }
-
         return false;
     }
 
@@ -53,16 +85,14 @@ public class BeingBehavior : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
     }
 
-    void UpdateMovement()
+    void MoveTowardsPlayer()
     {
-        if (CanSeePlayer())
-        {
-            agent.SetDestination(player.position);
-        }
-        else
-        {
-            agent.SetDestination(lastKnowPlayerPos);
-        }
+        agent.SetDestination(player.position);
+    }
+
+    void MoveTowardsLastKnownPlayerPos()
+    {
+        agent.SetDestination(lastKnowPlayerPos);
     }
 
     // DEBUG

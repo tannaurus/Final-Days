@@ -13,7 +13,7 @@ public class BeingHead : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
-    public bool HasEyesOnPlayer()
+    public bool PlayerInLineOfSight()
     {
         Vector3 playerDirection = player.position - transform.position;
         if (Physics.Raycast(transform.position, playerDirection, out RaycastHit hit))
