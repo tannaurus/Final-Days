@@ -5,8 +5,6 @@ using UnityEngine;
 public class BeingHead : MonoBehaviour
 {
     private Transform player;
-    public bool awake = true;
-    public float viewDistance = 100f;
     // public float speed = 1f;
 
     // Use this for initialization
@@ -15,44 +13,40 @@ public class BeingHead : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    public bool HasEyesOnPlayer()
     {
-        if (awake)
+        Vector3 playerDirection = player.position - transform.position;
+        if (Physics.Raycast(transform.position, playerDirection, out RaycastHit hit))
         {
-            MonitorPlayer();
+            Debug.Log(hit.transform.tag);
+            return hit.transform.tag == "Player";
         }
+        return false;
     }
 
-    void MonitorPlayer()
+    public void OnSite()
     {
         transform.LookAt(player.position);
     }
 
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, viewDistance);
-        Gizmos.DrawLine(transform.position, transform.position + transform.forward * viewDistance);
-    }
-
-    //void IdleMovement()
-    //{
-    //    List<Quaternion> groove = IdleHeadMovements.GetGroove();
-    //    RunMovement(groove);
-    //}
-
-    //void RunMovement(List<Quaternion> movement, int index = 0)
-    //{
-    //    float calculatedSpeed = speed * Time.deltaTime;
-    //    Quaternion.RotateTowards(transform.rotation, movement[index], calculatedSpeed);
-    //    if (index != movement.Count -1)
-    //    {
-    //        RunMovement(movement, index + 1);
-    //    }
-    //}
-
 }
+
+// BRING BACK AFTER MVP.
+//void IdleMovement()
+//{
+//    List<Quaternion> groove = IdleHeadMovements.GetGroove();
+//    RunMovement(groove);
+//}
+
+//void RunMovement(List<Quaternion> movement, int index = 0)
+//{
+//    float calculatedSpeed = speed * Time.deltaTime;
+//    Quaternion.RotateTowards(transform.rotation, movement[index], calculatedSpeed);
+//    if (index != movement.Count -1)
+//    {
+//        RunMovement(movement, index + 1);
+//    }
+//}
 
 //class IdleHeadMovements
 //{
