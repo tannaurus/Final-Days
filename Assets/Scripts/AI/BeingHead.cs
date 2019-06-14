@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.Collections; 
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,7 +18,6 @@ public class BeingHead : MonoBehaviour
         Vector3 playerDirection = player.position - transform.position;
         if (Physics.Raycast(transform.position, playerDirection, out RaycastHit hit))
         {
-            Debug.Log(hit.transform.tag);
             return hit.transform.tag == "Player";
         }
         return false;

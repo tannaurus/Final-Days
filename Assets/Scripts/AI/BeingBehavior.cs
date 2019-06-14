@@ -5,26 +5,38 @@ using UnityEngine.AI;
 
 public class BeingBehavior : MonoBehaviour
 {
+    // State
+    private int suspicion = 0;
+    private int prevSuspicion = 0;
+
+    // Behavior multipliers
+    public int age = 35;
+    public int awareness = 100;
+    public int sight = 100;
+    public int insanity = 0;
+
     public bool awake = true;
-    public float viewDistance = 100f;
-    public float viewAngle = 60f;
-    public float suspiciousness = 0.5f;
 
     private Transform player;
     private Vector3 lastKnowPlayerPos;
     private NavMeshAgent agent;
     private BeingHead brain;
-    private float suspicion = 0f;
-    private float prevSuspicion = 0f;
-    
+    readonly List<int> ageBreakpoints = BehaviorHelper.GetAgeBreakpoints();
+
+    // Default values that will be calculated by other factors
+    private int viewAngle = 60;
+    private float viewDistance = 100f;
+    private int suspiciousness = 1;
+
     // Use this for initialization
     void Start()
     {
+        InitializeBehaviorValues();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         agent = GetComponent<NavMeshAgent>();
         brain = GetComponentInChildren<BeingHead>();
         lastKnowPlayerPos = transform.position;
-        InvokeRepeating("ManageSuspicion", 0f, 1f);
+        InvokeRepeating("ManageAwareness", 0f, 1f);
     }
 
     // Update is called once per frame
@@ -33,14 +45,47 @@ public class BeingBehavior : MonoBehaviour
         ManageBehaviorTowardsPlayer();
     }
 
-    void ManageSuspicion()
+    void InitializeBehaviorValues()
+    {
+        SetViewAngle();
+        SetViewDistance();
+    }
+
+    void SetViewAngle() {
+        List<int> values = new List<int>();
+        values.Add(160);
+        values.Add(120);
+        values.Add(100);
+        values.Add(90);
+        values.Add(60);
+        viewAngle = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
+    }
+
+    void SetViewDistance()
+    {
+        List<int> values = new List<int>();
+        values.Add(60);
+        values.Add(120);
+        values.Add(100);
+        values.Add(80);
+        values.Add(60);
+        viewDistance = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
+        Debug.Log(viewDistance);
+    }
+
+    void ManageAwareness()
     {
         if (CanSeePlayer())
         {
             lastKnowPlayerPos = player.position;
             prevSuspicion = suspicion;
             suspicion += suspiciousness;
-        } else if (suspicion > 0f)
+            float distanceFromPlayer = Vector3.Distance(transform.position, player.position);
+            int distanceMultipler = (int)Mathf.Floor(distanceFromPlayer / 100f);
+            Debug.Log(distanceMultipler);
+            suspicion += distanceMultipler;
+        } 
+        else if (suspicion > 0)
         {
             suspicion -= suspiciousness;
         }
@@ -48,20 +93,19 @@ public class BeingBehavior : MonoBehaviour
 
     void ManageBehaviorTowardsPlayer()
     {
-        Debug.Log(suspicion);
         if (CanSeePlayer())
         {
-            if (suspicion > 3f)
+            if (suspicion > 3)
             {
                 brain.OnSite();
             }
-            if (suspicion > 5f)
+            if (suspicion > 4)
             {
                 RotateBody();
                 MoveTowardsPlayer();
             }
         }
-        else
+        else if (prevSuspicion > 0 & suspicion == 0)
         {
             MoveTowardsLastKnownPlayerPos();
         }

@@ -21,7 +21,6 @@ public static class ColliderHelper
             }
             i++;
         }
-        Debug.Log(foundColliders);
         return foundColliders;
     }
 }
