@@ -11,13 +11,11 @@ public class BeingBehavior : MonoBehaviour
 
     // Behavior multipliers
     public int age = 35;
-    public int awareness = 100;
-    public int sight = 100;
-    public int insanity = 0;
 
     public bool awake = true;
 
     private Transform player;
+    private Transform head;
     private Vector3 lastKnowPlayerPos;
     private NavMeshAgent agent;
     private BeingHead brain;
@@ -31,10 +29,8 @@ public class BeingBehavior : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        SetComponents();
         InitializeBehaviorValues();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        agent = GetComponent<NavMeshAgent>();
-        brain = GetComponentInChildren<BeingHead>();
         lastKnowPlayerPos = transform.position;
         InvokeRepeating("ManageAwareness", 0f, 1f);
     }
@@ -45,10 +41,28 @@ public class BeingBehavior : MonoBehaviour
         ManageBehaviorTowardsPlayer();
     }
 
+    // -- SETTERS ----------
+    void SetComponents()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        head = GameObject.Find("Player").transform;
+        agent = GetComponent<NavMeshAgent>();
+        brain = GetComponentInChildren<BeingHead>();
+        foreach (Transform child in transform)
+        {
+            if (child.gameObject.tag == "Head")
+            {
+                head = child;
+            }
+        }
+    }
+
     void InitializeBehaviorValues()
     {
         SetViewAngle();
         SetViewDistance();
+        SetSuspiciousness();
+        SetSpeed();
     }
 
     void SetViewAngle() {
@@ -64,12 +78,34 @@ public class BeingBehavior : MonoBehaviour
     void SetViewDistance()
     {
         List<int> values = new List<int>();
-        values.Add(60);
+        values.Add(100);
         values.Add(120);
         values.Add(100);
         values.Add(80);
         values.Add(60);
         viewDistance = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
+    }
+
+    void SetSuspiciousness() 
+    {
+        List<int> values = new List<int>();
+        values.Add(30);
+        values.Add(50);
+        values.Add(30);
+        values.Add(20);
+        values.Add(10);
+        suspiciousness = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
+    }
+
+    void SetSpeed()
+    {
+        List<int> values = new List<int>();
+        values.Add(8);
+        values.Add(6);
+        values.Add(5);
+        values.Add(4);
+        values.Add(3);
+        agent.speed = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
     }
 
     void ManageAwareness()
@@ -80,7 +116,7 @@ public class BeingBehavior : MonoBehaviour
             prevSuspicion = suspicion;
             suspicion += suspiciousness;
             float distanceFromPlayer = Vector3.Distance(transform.position, player.position);
-            int distanceMultipler = (int)Mathf.Floor(distanceFromPlayer / 100f);
+            int distanceMultipler = (int)Mathf.Floor(2000f / distanceFromPlayer);
             Debug.Log(distanceMultipler);
             suspicion += distanceMultipler;
         } 
@@ -94,11 +130,11 @@ public class BeingBehavior : MonoBehaviour
     {
         if (CanSeePlayer())
         {
-            if (suspicion > 3)
+            if (suspicion > 95)
             {
                 brain.OnSite();
             }
-            if (suspicion > 4)
+            if (suspicion > 100)
             {
                 RotateBody();
                 MoveTowardsPlayer();
@@ -112,9 +148,9 @@ public class BeingBehavior : MonoBehaviour
 
     bool CanSeePlayer()
     {
-        float distanceFromPlayer = Vector3.Distance(transform.position, player.position);
-        Vector3 playerDirection = player.position - transform.position;
-        float angleOfView = Vector3.Angle(playerDirection, transform.forward);
+        float distanceFromPlayer = Vector3.Distance(head.position, player.position);
+        Vector3 playerDirection = player.position - head.position;
+        float angleOfView = Vector3.Angle(playerDirection, head.forward);
         if (distanceFromPlayer <= viewDistance & angleOfView <= viewAngle & brain.PlayerInLineOfSight()) {
             return true;
         }
@@ -142,8 +178,11 @@ public class BeingBehavior : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, viewDistance);
-        Gizmos.DrawLine(transform.position, transform.position + transform.forward * viewDistance);
+        if (head)
+        {
+            Gizmos.DrawWireSphere(head.position, viewDistance);
+            Gizmos.DrawLine(head.position, transform.position + transform.forward * viewDistance);
+        }
     }
 
 }

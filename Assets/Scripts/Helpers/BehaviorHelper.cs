@@ -4,6 +4,7 @@ using UnityEngine;
 
 public static class BehaviorHelper
 {
+
     public static List<int> GetAgeBreakpoints()
     {
         List<int> breakpoints = new List<int>();
@@ -21,7 +22,6 @@ public static class BehaviorHelper
         bool caseFound = false;
         for (int index = 0; index < cases.Count; index++)
         {
-            Debug.Log("index");
             if (cases[index] >= exp & !caseFound)
             {
                 try
