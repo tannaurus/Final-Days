@@ -53,11 +53,11 @@ public class BeingBehavior : MonoBehaviour
 
     void SetViewAngle() {
         List<int> values = new List<int>();
-        values.Add(160);
-        values.Add(120);
-        values.Add(100);
-        values.Add(90);
-        values.Add(60);
+        values.Add(Random.Range(60, 160));
+        values.Add(Random.Range(60, 120));
+        values.Add(Random.Range(60, 100));
+        values.Add(Random.Range(60, 90));
+        values.Add(Random.Range(40, 80));
         viewAngle = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
     }
 
@@ -70,7 +70,6 @@ public class BeingBehavior : MonoBehaviour
         values.Add(80);
         values.Add(60);
         viewDistance = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
-        Debug.Log(viewDistance);
     }
 
     void ManageAwareness()
