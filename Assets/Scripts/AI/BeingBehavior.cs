@@ -10,9 +10,13 @@ public class BeingBehavior : MonoBehaviour
     private int prevSuspicion = 0;
     private int hunger = 100;
     private int thirst = 100;
+    readonly int needsThreshold = 90;
+    private List<GameObject> memory;
+    public BehaviorStates behaviorState = BehaviorStates.Wandering;
 
     // Behavior multipliers
     public int age = 35;
+    public enum BehaviorStates { LookingForPlayer, LookingForNeeds, Wandering };
 
     public bool awake = true;
     public bool debug = false;
@@ -63,6 +67,7 @@ public class BeingBehavior : MonoBehaviour
         SetViewDistance();
         SetSuspiciousness();
         SetSpeed();
+        SetMemory();
     }
 
     void SetViewAngle() {
@@ -108,6 +113,12 @@ public class BeingBehavior : MonoBehaviour
         agent.speed = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
     }
 
+    void SetMemory()
+    {
+        memory = GenericHelper.FindObjectsInLayer(9);
+    }
+
+    // -- UPDATERS ----------
     void ManageAwareness()
     {
         if (CanSeePlayer())
@@ -142,6 +153,56 @@ public class BeingBehavior : MonoBehaviour
         if (debug)
         {
             debugTextMesh.text = "Hunger: " + hunger.ToString() + " - " + "Thirst: " + thirst.ToString();
+        }
+        ManageNeeds();
+    }
+
+    void ManageNeeds()
+    {
+        if (suspicion == 0)
+        {
+            if (thirst < needsThreshold)
+            {
+                GetWater();
+            }
+        }
+    }
+    // -- MOVEMENT ----------
+    void GetWater()
+    {
+        // No need to look again.
+        if (behaviorState == BehaviorStates.LookingForNeeds)
+        {
+            return;
+        }
+
+        GameObject closestObj = null;
+        foreach (GameObject obj in memory)
+        {
+            if (obj.tag != "Drink")
+            {
+                break;
+            }
+            if (closestObj == null)
+            {
+                closestObj = obj;
+            }
+            else
+            {
+                float currentClosest = Vector3.Distance(closestObj.transform.position, transform.position);
+                float activeDistance = Vector3.Distance(obj.transform.position, transform.position);
+                if (activeDistance < currentClosest) 
+                {
+                    closestObj = obj;
+                }
+            }
+        }
+        closestObj.transform.position = new Vector3(closestObj.transform.position.x, 0, closestObj.transform.position.z);
+        if (closestObj != null)
+        {
+            behaviorState = BehaviorStates.LookingForNeeds;
+            Debug.Log(closestObj.transform.position);
+            agent.SetDestination(closestObj.transform.position);
         }
     }
 
@@ -193,12 +254,11 @@ public class BeingBehavior : MonoBehaviour
         agent.SetDestination(lastKnowPlayerPos);
     }
 
-    // DEBUG
+    // -- DEBUG ----------
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.blue;
-        Debug.Log(!!head);
-        if (debug)
+        if (debug & head != null)
         {
             Gizmos.DrawWireSphere(head.position, viewDistance);
             Gizmos.DrawLine(head.position, transform.position + transform.forward * viewDistance);
