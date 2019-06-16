@@ -8,17 +8,21 @@ public class BeingBehavior : MonoBehaviour
     // State
     private int suspicion = 0;
     private int prevSuspicion = 0;
+    private int hunger = 100;
+    private int thirst = 100;
 
     // Behavior multipliers
     public int age = 35;
 
     public bool awake = true;
+    public bool debug = false;
 
     private Transform player;
     private Transform head;
     private Vector3 lastKnowPlayerPos;
     private NavMeshAgent agent;
     private BeingHead brain;
+    private TextMesh debugTextMesh;
     readonly List<int> ageBreakpoints = BehaviorHelper.GetAgeBreakpoints();
 
     // Default values that will be calculated by other factors
@@ -33,6 +37,7 @@ public class BeingBehavior : MonoBehaviour
         InitializeBehaviorValues();
         lastKnowPlayerPos = transform.position;
         InvokeRepeating("ManageAwareness", 0f, 1f);
+        InvokeRepeating("ReduceNeeds", 0f, 1f);
     }
 
     // Update is called once per frame
@@ -48,13 +53,8 @@ public class BeingBehavior : MonoBehaviour
         head = GameObject.Find("Player").transform;
         agent = GetComponent<NavMeshAgent>();
         brain = GetComponentInChildren<BeingHead>();
-        foreach (Transform child in transform)
-        {
-            if (child.gameObject.tag == "Head")
-            {
-                head = child;
-            }
-        }
+        head = GenericHelper.FindChildTransformWithTag("Head", transform);
+        debugTextMesh = GenericHelper.FindChildTransformWithTag("DebugTextMesh", head).GetComponent<TextMesh>();
     }
 
     void InitializeBehaviorValues()
@@ -126,6 +126,25 @@ public class BeingBehavior : MonoBehaviour
         }
     }
 
+    void ReduceNeeds()
+    {
+        if (hunger != 0 && hunger > 1)
+        {
+            hunger--;
+        }
+        if (thirst != 0 & thirst > 2)
+        {
+            thirst = thirst - 2;
+        } else if (thirst != 0)
+        {
+            thirst = 0;
+        }
+        if (debug)
+        {
+            debugTextMesh.text = "Hunger: " + hunger.ToString() + " - " + "Thirst: " + thirst.ToString();
+        }
+    }
+
     void ManageBehaviorTowardsPlayer()
     {
         if (CanSeePlayer())
@@ -178,7 +197,8 @@ public class BeingBehavior : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.blue;
-        if (head)
+        Debug.Log(!!head);
+        if (debug)
         {
             Gizmos.DrawWireSphere(head.position, viewDistance);
             Gizmos.DrawLine(head.position, transform.position + transform.forward * viewDistance);
