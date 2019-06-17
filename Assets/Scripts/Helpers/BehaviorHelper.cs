@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public static class BehaviorHelper
 {
@@ -37,5 +38,49 @@ public static class BehaviorHelper
         }
         // Default to 90
         return 90;
+    }
+
+    public static bool AtEndOfPath(NavMeshAgent agent)
+    {
+        return !agent.pathPending & agent.remainingDistance <= agent.stoppingDistance;
+    }
+
+    public static GameObject FindNearestObjectInMemoryWithTag(string tag, Transform transform, List<GameObject> memory)
+    {
+        GameObject closestObj = null;
+        foreach (GameObject obj in memory)
+        {
+            if (obj.tag != tag)
+            {
+                break;
+            }
+            if (closestObj == null)
+            {
+                closestObj = obj;
+            }
+            else
+            {
+                float currentClosest = Vector3.Distance(closestObj.transform.position, transform.position);
+                float activeDistance = Vector3.Distance(obj.transform.position, transform.position);
+                if (activeDistance < currentClosest)
+                {
+                    closestObj = obj;
+                }
+            }
+        }
+        return closestObj;
+    }
+
+    public static List<GameObject> RemoveGameObjectFromMemory(GameObject gameObject, List<GameObject> memory)
+    {
+        List<GameObject> newList = new List<GameObject>();
+        foreach (GameObject obj in memory)
+        {
+            if (obj.GetInstanceID() != gameObject.GetInstanceID())
+            {
+                newList.Add(obj);
+            }
+        }
+        return newList;
     }
 }

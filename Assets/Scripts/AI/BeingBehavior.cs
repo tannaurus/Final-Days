@@ -16,7 +16,7 @@ public class BeingBehavior : MonoBehaviour
 
     // Behavior multipliers
     public int age = 35;
-    public enum BehaviorStates { LookingForPlayer, LookingForNeeds, Wandering };
+    public enum BehaviorStates { LookingForPlayer, LookingForWater, Drinking, Wandering };
 
     public bool awake = true;
     public bool debug = false;
@@ -41,7 +41,7 @@ public class BeingBehavior : MonoBehaviour
         InitializeBehaviorValues();
         lastKnowPlayerPos = transform.position;
         InvokeRepeating("ManageAwareness", 0f, 1f);
-        InvokeRepeating("ReduceNeeds", 0f, 1f);
+        InvokeRepeating("ManageNeeds", 0f, 1f);
     }
 
     // Update is called once per frame
@@ -105,11 +105,11 @@ public class BeingBehavior : MonoBehaviour
     void SetSpeed()
     {
         List<int> values = new List<int>();
-        values.Add(8);
-        values.Add(6);
-        values.Add(5);
-        values.Add(4);
-        values.Add(3);
+        values.Add(30);
+        values.Add(25);
+        values.Add(20);
+        values.Add(15);
+        values.Add(10);
         agent.speed = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
     }
 
@@ -137,7 +137,7 @@ public class BeingBehavior : MonoBehaviour
         }
     }
 
-    void ReduceNeeds()
+    void ManageNeeds()
     {
         if (hunger != 0 && hunger > 1)
         {
@@ -146,19 +146,12 @@ public class BeingBehavior : MonoBehaviour
         if (thirst != 0 & thirst > 2)
         {
             thirst = thirst - 2;
-        } else if (thirst != 0)
+        }
+        else
         {
             thirst = 0;
         }
-        if (debug)
-        {
-            debugTextMesh.text = "Hunger: " + hunger.ToString() + " - " + "Thirst: " + thirst.ToString();
-        }
-        ManageNeeds();
-    }
 
-    void ManageNeeds()
-    {
         if (suspicion == 0)
         {
             if (thirst < needsThreshold)
@@ -166,44 +159,38 @@ public class BeingBehavior : MonoBehaviour
                 GetWater();
             }
         }
+
+        if (debug)
+        {
+            debugTextMesh.text = "Hunger: " + hunger.ToString() + " - " + "Thirst: " + thirst.ToString();
+        }
     }
+
     // -- MOVEMENT ----------
     void GetWater()
     {
-        // No need to look again.
-        if (behaviorState == BehaviorStates.LookingForNeeds)
+        GameObject closestObj = BehaviorHelper.FindNearestObjectInMemoryWithTag("Drink", transform, memory);
+        if (closestObj == null)
         {
             return;
         }
 
-        GameObject closestObj = null;
-        foreach (GameObject obj in memory)
+        // No need to look again.
+        if (behaviorState == BehaviorStates.LookingForWater)
         {
-            if (obj.tag != "Drink")
+            if (BehaviorHelper.AtEndOfPath(agent))
             {
-                break;
+                Destroy(closestObj);
+                memory = BehaviorHelper.RemoveGameObjectFromMemory(closestObj, memory);
+                agent.SetDestination(transform.position);
+                thirst += 20;
+                behaviorState = BehaviorStates.Wandering;
             }
-            if (closestObj == null)
-            {
-                closestObj = obj;
-            }
-            else
-            {
-                float currentClosest = Vector3.Distance(closestObj.transform.position, transform.position);
-                float activeDistance = Vector3.Distance(obj.transform.position, transform.position);
-                if (activeDistance < currentClosest) 
-                {
-                    closestObj = obj;
-                }
-            }
+            return;
         }
-        closestObj.transform.position = new Vector3(closestObj.transform.position.x, 0, closestObj.transform.position.z);
-        if (closestObj != null)
-        {
-            behaviorState = BehaviorStates.LookingForNeeds;
-            Debug.Log(closestObj.transform.position);
-            agent.SetDestination(closestObj.transform.position);
-        }
+
+        behaviorState = BehaviorStates.LookingForWater;
+        agent.SetDestination(closestObj.transform.position);
     }
 
     void ManageBehaviorTowardsPlayer()
