@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum BehaviorStates { LookingForPlayer, LookingForWater, Drinking, Wandering };
+public enum BehaviorStates { LookingForPlayer, LookingForWater, LookingForFood, Wandering };
 
 public static class BehaviorHelper
 {
@@ -17,6 +17,12 @@ public static class BehaviorHelper
         breakpoints.Add(70);
         breakpoints.Add(90);
         return breakpoints;
+    }
+
+    // If a Being can perform a behavior (excludes pursuing the player)
+    public static bool CanPerformBehavior(BehaviorStates desiredState, BehaviorStates currentState)
+    {
+        return desiredState == currentState | currentState == BehaviorStates.Wandering;
     }
 
     public delegate void QuickIntSwitchFunc();
@@ -54,7 +60,7 @@ public static class BehaviorHelper
         {
             if (obj.tag != tag)
             {
-                break;
+                continue;
             }
             if (closestObj == null)
             {

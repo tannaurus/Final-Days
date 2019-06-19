@@ -79,7 +79,6 @@ public class BeingBehavior : MonoBehaviour
             suspicion += suspiciousness;
             float distanceFromPlayer = Vector3.Distance(transform.position, player.position);
             int distanceMultipler = (int)Mathf.Floor(2000f / distanceFromPlayer);
-            Debug.Log(distanceMultipler);
             suspicion += distanceMultipler;
         } 
         else if (suspicion > 0)
@@ -103,11 +102,16 @@ public class BeingBehavior : MonoBehaviour
             thirst = 0;
         }
 
+        // We only want the being to look for needs if it has no suspicion
+        // and isn't doing anything already.
         if (suspicion == 0)
         {
-            if (thirst < needsThreshold)
+            if (thirst < needsThreshold & BehaviorHelper.CanPerformBehavior(BehaviorStates.LookingForWater, behaviorState))
             {
                 GetWater();
+            } else if (hunger < needsThreshold & BehaviorHelper.CanPerformBehavior(BehaviorStates.LookingForFood, behaviorState))
+            {
+                GetFood();
             }
         }
 
@@ -131,7 +135,7 @@ public class BeingBehavior : MonoBehaviour
         {
             if (BehaviorHelper.AtEndOfPath(agent))
             {
-                int quench = closestObj.GetComponent<Drink>().quench;
+                int quench = closestObj.GetComponent<Drink>().value;
                 memory = BehaviorHelper.RemoveGameObjectFromMemory(closestObj, memory);
                 agent.SetDestination(transform.position);
                 thirst += quench;
@@ -142,6 +146,32 @@ public class BeingBehavior : MonoBehaviour
         }
 
         behaviorState = BehaviorStates.LookingForWater;
+        agent.SetDestination(closestObj.transform.position);
+    }
+
+    void GetFood()
+    {
+        GameObject closestObj = BehaviorHelper.FindNearestObjectInMemoryWithTag("Food", transform, memory);
+        if (closestObj == null)
+        {
+            return;
+        }
+        // No need to look again.
+        if (behaviorState == BehaviorStates.LookingForFood)
+        {
+            if (BehaviorHelper.AtEndOfPath(agent))
+            {
+                int food = closestObj.GetComponent<Food>().value;
+                memory = BehaviorHelper.RemoveGameObjectFromMemory(closestObj, memory);
+                agent.SetDestination(transform.position);
+                hunger += food;
+                behaviorState = BehaviorStates.Wandering;
+                Destroy(closestObj);
+            }
+            return;
+        }
+
+        behaviorState = BehaviorStates.LookingForFood;
         agent.SetDestination(closestObj.transform.position);
     }
 
