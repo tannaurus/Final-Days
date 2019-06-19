@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum BehaviorStates { LookingForPlayer, LookingForWater, Drinking, Wandering };
+
 public static class BehaviorHelper
 {
 

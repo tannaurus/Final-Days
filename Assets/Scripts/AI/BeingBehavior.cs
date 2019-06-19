@@ -16,7 +16,6 @@ public class BeingBehavior : MonoBehaviour
 
     // Behavior multipliers
     public int age = 35;
-    public enum BehaviorStates { LookingForPlayer, LookingForWater, Drinking, Wandering };
 
     public bool awake = true;
     public bool debug = false;
@@ -63,58 +62,10 @@ public class BeingBehavior : MonoBehaviour
 
     void InitializeBehaviorValues()
     {
-        SetViewAngle();
-        SetViewDistance();
-        SetSuspiciousness();
-        SetSpeed();
-        SetMemory();
-    }
-
-    void SetViewAngle() {
-        List<int> values = new List<int>();
-        values.Add(Random.Range(60, 160));
-        values.Add(Random.Range(60, 120));
-        values.Add(Random.Range(60, 100));
-        values.Add(Random.Range(60, 90));
-        values.Add(Random.Range(40, 80));
-        viewAngle = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
-    }
-
-    void SetViewDistance()
-    {
-        List<int> values = new List<int>();
-        values.Add(100);
-        values.Add(120);
-        values.Add(100);
-        values.Add(80);
-        values.Add(60);
-        viewDistance = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
-    }
-
-    void SetSuspiciousness() 
-    {
-        List<int> values = new List<int>();
-        values.Add(30);
-        values.Add(50);
-        values.Add(30);
-        values.Add(20);
-        values.Add(10);
-        suspiciousness = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
-    }
-
-    void SetSpeed()
-    {
-        List<int> values = new List<int>();
-        values.Add(30);
-        values.Add(25);
-        values.Add(20);
-        values.Add(15);
-        values.Add(10);
-        agent.speed = BehaviorHelper.QuickIntSwitch(age, ageBreakpoints, values);
-    }
-
-    void SetMemory()
-    {
+        viewAngle = BeingHelper.DetermineViewAngle(age);
+        viewDistance = BeingHelper.DetermineViewDistance(age);
+        suspiciousness = BeingHelper.DetermineSuspiciousness(age);
+        agent.speed = BeingHelper.DetermineSpeed(age);
         memory = GenericHelper.FindObjectsInLayer(9);
     }
 
