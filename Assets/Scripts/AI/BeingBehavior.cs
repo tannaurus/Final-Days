@@ -180,11 +180,12 @@ public class BeingBehavior : MonoBehaviour
         {
             if (BehaviorHelper.AtEndOfPath(agent))
             {
-                Destroy(closestObj);
+                int quench = closestObj.GetComponent<Drink>().quench;
                 memory = BehaviorHelper.RemoveGameObjectFromMemory(closestObj, memory);
                 agent.SetDestination(transform.position);
-                thirst += 20;
+                thirst += quench;
                 behaviorState = BehaviorStates.Wandering;
+                Destroy(closestObj);
             }
             return;
         }
