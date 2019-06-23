@@ -5,6 +5,20 @@ using UnityEngine.AI;
 
 public static class BeingHelper
 {
+
+    public static List<GameObject> RemoveGameObjectFromMemory(GameObject gameObject, List<GameObject> memory)
+    {
+        List<GameObject> newList = new List<GameObject>();
+        foreach (GameObject obj in memory)
+        {
+            if (obj.GetInstanceID() != gameObject.GetInstanceID())
+            {
+                newList.Add(obj);
+            }
+        }
+        return newList;
+    }
+
     public static int DetermineViewAngle(int age)
     {
         List<int> values = new List<int>();

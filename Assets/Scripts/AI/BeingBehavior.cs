@@ -11,7 +11,6 @@ public class BeingBehavior : MonoBehaviour
     private int hunger = 100;
     private int thirst = 100;
     readonly int needsThreshold = 90;
-    private List<GameObject> memory;
     public BehaviorStates behaviorState = BehaviorStates.Wandering;
 
     // Behavior multipliers
@@ -22,6 +21,7 @@ public class BeingBehavior : MonoBehaviour
 
     private Transform player;
     private Transform head;
+    private MemorySystem memorySystem;
     private Vector3 lastKnowPlayerPos;
     private NavMeshAgent agent;
     private BeingHead brain;
@@ -54,6 +54,7 @@ public class BeingBehavior : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         head = GameObject.Find("Player").transform;
+        memorySystem = GetComponent<MemorySystem>();
         agent = GetComponent<NavMeshAgent>();
         brain = GetComponentInChildren<BeingHead>();
         head = GenericHelper.FindChildTransformWithTag("Head", transform);
@@ -66,7 +67,6 @@ public class BeingBehavior : MonoBehaviour
         viewDistance = BeingHelper.DetermineViewDistance(age);
         suspiciousness = BeingHelper.DetermineSuspiciousness(age);
         agent.speed = BeingHelper.DetermineSpeed(age);
-        memory = GenericHelper.FindObjectsInLayer(9);
     }
 
     // -- UPDATERS ----------
@@ -124,7 +124,7 @@ public class BeingBehavior : MonoBehaviour
     // -- MOVEMENT ----------
     void GetWater()
     {
-        GameObject closestObj = BehaviorHelper.FindNearestObjectInMemoryWithTag("Drink", transform, memory);
+        GameObject closestObj = memorySystem.FindNearestGameObjectInMemory("Drink", transform);
         if (closestObj == null)
         {
             return;
@@ -136,7 +136,7 @@ public class BeingBehavior : MonoBehaviour
             if (BehaviorHelper.AtEndOfPath(agent))
             {
                 int quench = closestObj.GetComponent<Drink>().value;
-                memory = BehaviorHelper.RemoveGameObjectFromMemory(closestObj, memory);
+                memorySystem.RemoveGameObjectFromMemory(closestObj);
                 agent.SetDestination(transform.position);
                 thirst += quench;
                 behaviorState = BehaviorStates.Wandering;
@@ -151,7 +151,7 @@ public class BeingBehavior : MonoBehaviour
 
     void GetFood()
     {
-        GameObject closestObj = BehaviorHelper.FindNearestObjectInMemoryWithTag("Food", transform, memory);
+        GameObject closestObj = memorySystem.FindNearestGameObjectInMemory("Food", transform);
         if (closestObj == null)
         {
             return;
@@ -162,7 +162,7 @@ public class BeingBehavior : MonoBehaviour
             if (BehaviorHelper.AtEndOfPath(agent))
             {
                 int food = closestObj.GetComponent<Food>().value;
-                memory = BehaviorHelper.RemoveGameObjectFromMemory(closestObj, memory);
+                memorySystem.RemoveGameObjectFromMemory(closestObj);
                 agent.SetDestination(transform.position);
                 hunger += food;
                 behaviorState = BehaviorStates.Wandering;
